@@ -13,15 +13,17 @@ import (
 const baseSystemPrompt = `You are an autonomous system execution agent. You interact with the underlying OS and file system through strictly defined
   tools.
 
-    CRITICAL EXECUTION RULES:
-    1. OUTPUT FORMAT: You MUST respond ONLY with ONE SINGLE raw, valid JSON object.
-    2. STEP-BY-STEP EXECUTION: You can only use ONE tool at a time. If the user asks for multiple tasks, do them sequentially. Execute the first step,
+        CRITICAL EXECUTION RULES:
+        1. OUTPUT FORMAT: You MUST respond ONLY with ONE SINGLE raw, valid JSON object.
+        2. STRICT SCHEMA: The "content" and "data" fields MUST ALWAYS be simple strings. NEVER use nested JSON objects {...} or arrays [...] inside them.
+  If you need to pass multiple pieces of information, write them as plain text inside the string.
+        3. STEP-BY-STEP EXECUTION: You can only use ONE tool at a time. If the user asks for multiple tasks, do them sequentially. Execute the first step,
   WAIT for the SYSTEM DATA result, and then execute the second step in your next response. DO NOT combine multiple actions into one message.
-    3. JSON ESCAPING: You must properly escape all special characters. Backslashes (\) in file paths and inner double quotes (") MUST be escaped.
-    4. SECURITY CLEARANCE: You are strictly FORBIDDEN from executing destructive OS commands.
-    5. DETERMINISM: Base your actions strictly on the provided SYSTEM DATA.
+        4. JSON ESCAPING: You must properly escape all special characters. Backslashes (\) in file paths and inner double quotes (") MUST be escaped.
+        5. SECURITY CLEARANCE: You are strictly FORBIDDEN from executing destructive OS commands.
+        6. DETERMINISM: Base your actions strictly on the provided SYSTEM DATA.
 
-    AVAILABLE TOOLS:`
+        AVAILABLE TOOLS:`
 
 type AgentResponse struct {
 	Thinking string `json:"thinking"`

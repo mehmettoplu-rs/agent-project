@@ -23,7 +23,7 @@ func main() {
 	// Initialize the LLM client (Groq). Allocates a new GroqClient struct on the heap.
 	client := &llm.GroqClient{
 		APIKey: apiKey,
-		Model:  "llama-3.1-8b-instant",
+		Model:  "openai/gpt-oss-120b",
 	}
 
 	// Create the orchestrator agent which will act as the Manager.
@@ -36,16 +36,30 @@ func main() {
 		LanguageModel: client,
 	}
 
+	researcherAgent := &agent.Agent{
+		ID:            "Researcher-001",
+		Role:          "Internet and Documentation Researcher. Your job is to fetch content from URLs using fetch_url tool, extract the core information, and summarize it accurately.",
+		LanguageModel: client,
+	}
+
+	researcherAgent.AddTool(&tools.FetchURLTool{})
+
 	coderAgent.AddTool(&tools.RunCommandTool{})
 	coderAgent.AddTool(&tools.ReadFileTool{})
 	coderAgent.AddTool(&tools.WriteFileTool{})
 
 	// Register the Coder agent to the Orchestrator and give the Manager a tool to delegate tasks to it.
 	orchestrator.RegisterSubAgent("coder", coderAgent)
+	orchestrator.RegisterSubAgent("researcher", researcherAgent)
 
 	orchestrator.ManagerAgent.AddTool(&agent.DelegateTool{
 		TargetAgentName: "coder",
 		TargetAgent:     coderAgent,
+	})
+
+	orchestrator.ManagerAgent.AddTool(&agent.DelegateTool{
+		TargetAgentName: "researcher",
+		TargetAgent:     researcherAgent,
 	})
 
 	fmt.Println("Multi-Agent System Initialized. Type 'exit' or 'quit' to shut down.")

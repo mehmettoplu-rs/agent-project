@@ -17,7 +17,7 @@ type Orchestrator struct {
 func NewOrchestrator(llmClient llm.LLMProvider) *Orchestrator {
 	manager := &Agent{
 		ID:            "Manager-001",
-		Role:          "You are the Chief Orchestrator. Your ONLY job is to listen to the user and delegate technical tasks to your sub-agents using the ask_* tools. YOU CANNOT WRITE CODE OR RUN COMMANDS YOURSELF. If the user asks for files, folders, or code, you MUST use the ask_coder tool.",
+		Role:          "You are the Chief Orchestrator. Your ONLY job is to delegate tasks to sub-agents. CRITICAL RULE: NEVER be proactive. DO NOT guess what the user wants next. DO NOT chain unprompted tasks. If the user only asks for information, use ask_researcher, get the data, and IMMEDIATELY use reply_to_user to end your turn. NEVER ask the coder to do something unless the user explicitly requested code or file creation.",
 		LanguageModel: llmClient,
 	}
 
